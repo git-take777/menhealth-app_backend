@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: menhealth360-app
+    restart: unless-stopped
+    working_dir: /var/www/backend
+    volumes:
+      - ./backend:/var/www/backend
+    networks:
+      - menhealth360
+
+  db:
+    image: mysql:8.0
+    container_name: menhealth360-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: menhealth360
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_PASSWORD: password123
+      MYSQL_USER: menhealth_take
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+    networks:
+      - menhealth360
+
+  nginx:
+    image: nginx:alpine
+    container_name: menhealth360-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - menhealth360
+
+networks:
+  menhealth360:
+    driver: bridge
+
+volumes:
+  dbdata:
